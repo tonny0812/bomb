@@ -2,6 +2,7 @@ package com.llmoe.bomb.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.llmoe.bomb.entity.BombTask;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -28,4 +29,12 @@ public interface BombTaskMapper extends BaseMapper<BombTask> {
      * @return 结果
      */
     int updateTaskStatus();
+
+    /**
+     * 查询这个IP最近一小时的轰炸任务
+     *
+     * @param ipAddr IP地址
+     * @return 结果
+     */
+    int selectRecentTaskByIp(@Param("ipAddr") String ipAddr);
 }

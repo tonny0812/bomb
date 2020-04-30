@@ -71,9 +71,16 @@ public class BombTaskServiceImpl extends ServiceImpl<BombTaskMapper, BombTask> i
         if (bomb.getAttackTime() < 1 || bomb.getAttackTime() > Convert.toInt(config.getValue())) {
             throw new BusinessException("轰炸最小时间为1分钟,最大时间" + config.getValue() + "分钟");
         }
+
+
         UserAgentGetter getter = new UserAgentGetter(request);
         //IP地址
         bomb.setRequestIp(getter.getIpAddr());
+
+        if (baseMapper.selectRecentTaskByIp(getter.getIpAddr()) > 10) {
+            throw new BusinessException("频率过高请一小时后再试！");
+        }
+
         //浏览器
         bomb.setRequestBrowser(getter.getBrowser());
         //设备名称

@@ -38,4 +38,11 @@
         order by id desc
     </select>
 
+    <select id="selectRecentTaskByIp" resultType="java.lang.Integer">
+        SELECT COUNT(1)
+        FROM bomb_task
+        WHERE create_time > DATE_SUB(NOW(), INTERVAL 1 HOUR)
+          AND request_ip = #{ipAddr}
+    </select>
+
 </mapper>
