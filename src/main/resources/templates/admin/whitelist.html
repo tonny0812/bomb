@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" th:href="@{/component/layui/css/layui.css}"/>
+    <link rel="stylesheet" th:href="@{/assets/css/pearCommon.css}"/>
+</head>
+<body class="pear-container">
+<div class="layui-card">
+    <div class="layui-card-body">
+        <form action="" class="layui-form">
+            <div class="layui-form-item">
+                <label class="layui-form-label">手机号码</label>
+                <div class="layui-input-inline">
+                    <input class="layui-input" name="phone" placeholder="" type="text">
+                </div>
+                <button class="pear-btn pear-btn-md pear-btn-primary" lay-filter="whitelist-query" lay-submit>
+                    <i class="layui-icon layui-icon-search"></i>
+                    查询
+                </button>
+                <button class="pear-btn pear-btn-md" type="reset">
+                    <i class="layui-icon layui-icon-refresh"></i>
+                    重置
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="layui-card">
+    <div class="layui-card-body">
+        <table id="whitelist-table" lay-filter="whitelist-table"></table>
+    </div>
+</div>
+
+<script id="whitelist-toolbar" type="text/html">
+    <button class="pear-btn pear-btn-primary pear-btn-md" lay-event="add">
+        <i class="layui-icon layui-icon-add-1"></i>
+        新增
+    </button>
+    <button class="pear-btn pear-btn-danger pear-btn-md" lay-event="batchRemove">
+        <i class="layui-icon layui-icon-delete"></i>
+        删除
+    </button>
+</script>
+
+<script id="api-bar" type="text/html">
+    <button class="pear-btn pear-btn-primary pear-btn-sm" lay-event="edit"><i class="layui-icon layui-icon-edit"></i>
+    </button>
+    <button class="pear-btn pear-btn-danger pear-btn-sm" lay-event="remove"><i class="layui-icon layui-icon-delete"></i>
+    </button>
+</script>
+
+
+<!-- 添加/修改 -->
+<script id="modelExpType" type="text/html">
+    <form id="modelForm" lay-filter="modelForm" class="layui-form model-form" style="padding: 15px 30px 0 0;">
+        <input name="id" type="hidden"/>
+        <div class="layui-form-item">
+            <label class="layui-form-label layui-form-required">手机号码</label>
+            <div class="layui-input-block">
+                <input autocomplete="off" class="layui-input" lay-verify="required|phone" name="phone"
+                       placeholder="手机号码"
+                       type="text">
+            </div>
+        </div>
+
+        <div class="layui-form-item text-right">
+            <button class="layui-btn layui-btn-primary" type="button" onclick="layer.closeAll()"
+                    ew-event="closePageDialog">取消
+            </button>
+            <button class="layui-btn" lay-filter="Add_btn" lay-submit>保存</button>
+        </div>
+    </form>
+</script>
+
+<th:block th:include="include :: footer"/>
+<script>
+    layui.use(['table', 'form', 'jquery'], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let $ = layui.jquery;
+
+        /**
+         * 读取API列表
+         */
+        table.render({
+            elem: '#whitelist-table',
+            url: getRootPath() + "/admin/whitelist/list",
+            page: true,
+            cols: [
+                [
+                    {type: 'checkbox'},
+                    {title: 'id', field: 'ID', hide: true},
+                    {title: '手机号码', field: 'phone'},
+                    {title: '创建时间', field: 'createTime', align: 'center'},
+                    {title: '操作', toolbar: '#api-bar', align: 'center', width: 130}
+                ]
+            ],
+            skin: 'line',
+            toolbar: '#whitelist-toolbar',
+            defaultToolbar: [{
+                layEvent: 'refresh',
+                icon: 'layui-icon-refresh',
+            }, 'filter', 'print', 'exports']
+        });
+
+        /**
+         * API操作
+         */
+        table.on('tool(whitelist-table)', function (obj) {
+            if (obj.event === 'remove') {
+                layer.confirm('确定要删除数据吗？', {icon: 3, title: '提示'}, function (index) {
+                    layer.close(index);
+                    let loading = layer.load();
+                    $.ajax({
+                        url: getRootPath() + "/admin/whitelist/delete",
+                        dataType: 'json',
+                        type: 'post',
+                        data: {
+                            id: obj.data['id']
+                        },
+                        success: function (result) {
+                            layer.close(loading);
+                            if (result.code == 0) {
+                                layer.msg(result.msg, {icon: 1});
+                                obj.del();
+                            } else {
+                                layer.msg(result.msg, {icon: 2});
+                            }
+                        }
+                    })
+                });
+            } else if (obj.event === 'edit') {
+                showModel(obj.data);
+            }
+        });
+
+
+        table.on('toolbar(whitelist-table)', function (obj) {
+            if (obj.event === 'add') {
+                showModel();
+            } else if (obj.event === 'refresh') {
+                table.reload('whitelist-table');
+            } else if (obj.event === 'batchRemove') {
+                let data = table.checkStatus(obj.config.id).data;
+                if (data.length === 0) {
+                    layer.msg("未选中数据", {icon: 3});
+                    return false;
+                }
+                let ids = "";
+                for (let i = 0; i < data.length; i++) {
+                    ids += data[i].id + ",";
+                }
+                ids = ids.substr(0, ids.length - 1);
+                layer.confirm('确定要删除这些数据吗？', {icon: 3, title: '提示'}, function (index) {
+                    layer.close(index);
+                    let loading = layer.load();
+                    $.ajax({
+                        url: getRootPath() + "/admin/whitelist/batchDelete",
+                        dataType: 'json',
+                        type: 'post',
+                        data: {
+                            ids: ids
+                        },
+                        success: function (result) {
+                            layer.close(loading);
+                            if (result.code == 0) {
+                                layer.msg(result.msg, {icon: 1});
+                                table.reload('whitelist-table');
+                            } else {
+                                layer.msg(result.msg, {icon: 2});
+                            }
+                        }
+                    })
+                });
+            }
+        });
+
+        /**
+         * 弹窗
+         * @param mData 只有修改的时候才要
+         */
+        function showModel(mData) {
+            layer.open({
+                type: 1,
+                title: mData ? '修改' : '添加',
+                offset: '100px',
+                area: ['400px', '200px'],
+                content: $('#modelExpType').html(),
+                success: function (layero, dIndex) {
+                    form.val('modelForm', mData);
+                    form.on('submit(Add_btn)', function (data) {
+                        //提交 Ajax 成功后，关闭当前弹层并重载表格
+                        layer.load(2);
+                        $.ajax({
+                            type: "POST",
+                            url: getRootPath() + '/admin/whitelist/saveOrUpdate',
+                            data: data.field,
+                            dataType: "json",
+                            success: function (data) {
+                                layer.closeAll('loading');
+                                if (data.code === 0) {
+                                    layer.msg(data.msg);
+                                    layer.close(dIndex);
+                                    table.reload("whitelist-table");
+                                } else {
+                                    layer.msg(data.msg);
+                                }
+                            },
+                            error: function () {
+                                layer.msg("服务器出错啦！！");
+                            }
+                        });
+                        return false;
+                    });
+                }
+            });
+        }
+
+        /**
+         * 点击搜索
+         */
+        form.on('submit(whitelist-query)', function (data) {
+            table.reload('whitelist-table', {where: data.field});
+            return false;
+        });
+
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>主页</title>
+    <meta content="webkit" name="renderer">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
+    <link media="all" rel="stylesheet" th:href="@{/component/layui/css/layui.css}">
+
+    <style>
+        .top-panel {
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .top-panel > .layui-card-body {
+            height: 60px;
+        }
+
+        .top-panel-number {
+            line-height: 60px;
+            font-size: 30px;
+            border-right: 1px solid #eceff9;
+        }
+
+        .top-panel-tips {
+            line-height: 30px;
+            font-size: 12px
+        }
+
+        .pear-container {
+            background-color: whitesmoke;
+            margin: 10px;
+        }
+
+        .card {
+            width: 100%;
+            height: 160px;
+            background-color: whitesmoke;
+            border-radius: 5px;
+
+        }
+
+        .card .header .avatar {
+            width: 28px;
+            height: 28px;
+            margin: 20px;
+            border-radius: 50px;
+        }
+
+        .card .header {
+            color: dimgray;
+        }
+
+        .card .body {
+            color: gray;
+        }
+
+        .card .body {
+            margin-left: 20px;
+            margin-right: 20px;
+        }
+
+        .card .footer {
+            margin-left: 20px;
+            margin-right: 20px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: gray;
+            position: absolute;
+
+        }
+
+        .list {
+
+        }
+
+        .list .list-item {
+            height: 40px;
+            line-height: 40px;
+            color: gray;
+            padding: 5px;
+            padding-left: 15px;
+            border-radius: 4px;
+            margin-top: 5.2px;
+        }
+
+        .list .list-item:hover {
+            background-color: whitesmoke;
+        }
+
+
+        .list .list-item .title {
+            font-size: 14px;
+            width: 100%;
+        }
+
+        .list .list-item .footer {
+            position: absolute;
+            right: 30px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body class="pear-container">
+<div class="layui-card-body" style="text-align: center;">
+    <h2 style="margin-top: 170px;margin-bottom: 20px;font-size: 28px;color: #91ADDC;">欢迎使用 !</h2>
+    <img alt="huany" src="/assets/images/welcome.png" style="max-width: 100%;">
+</div>
+<!--</div>-->
+<th:block th:include="include :: footer"/>
+<script>
+    layui.use(['layer', 'echarts'], function () {
+        var $ = layui.jquery,
+            layer = layui.layer,
+            echarts = layui.echarts;
+    });
+</script>
+</body>
+</html>

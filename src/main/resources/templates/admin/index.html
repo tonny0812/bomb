@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:include="include :: header('后台管理')"/>
+    <style id="pearone-bg-color">
+        /** 自 定 义 主 题 */
+    </style>
+</head>
+<body class="layui-layout-body  pear-admin">
+<!-- 布局框架 -->
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <ul class="layui-nav layui-layout-left">
+            <li class="collaspe layui-nav-item"><a class="layui-icon layui-icon-shrink-right" href="#"></a></li>
+            <li class="refresh layui-nav-item"><a class="layui-icon layui-icon-refresh-1" href="#"></a></li>
+        </ul>
+        <div class="layui-layout-control" id="control"></div>
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item layui-hide-xs"><a class="fullScreen layui-icon layui-icon-screen-full"
+                                                        href="#"></a></li>
+            <li class="layui-nav-item layui-hide-xs"><a class="layui-icon layui-icon-website" href="#"></a></li>
+            <li class="layui-nav-item layui-hide-xs"><a class="notice layui-icon layui-icon-notice" href="#"><span
+                    class="layui-badge-dot"></span></a></li>
+            <li class="layui-nav-item" lay-unselect="">
+                <a href="javascript:;"><img class="layui-nav-img" sec:authentication="name"
+                                            th:src="@{'http://q2.qlogo.cn/headimg_dl?dst_uin='+${config.get('qq_value')}  +'&spec=140'}"></a>
+                <dl class="layui-nav-child">
+                    <dd><a href="javascript:;" id="repwd">修改密码</a></dd>
+                    <dd><a th:href="@{/logout}">注销登陆</a></dd>
+                </dl>
+            </li>
+            <li class="setting layui-nav-item"><a class="layui-icon layui-icon-more-vertical" href="#"></a></li>
+        </ul>
+    </div>
+    <div class="layui-side layui-bg-black">
+        <div class="layui-logo">
+            <img class="logo" th:src="@{/assets/images/logo.png}"/>
+            <span class="title"> [[${config.get('site_name')}]]</span>
+        </div>
+        <div class="layui-side-scroll">
+            <div id="sideMenu"></div>
+        </div>
+    </div>
+    <div class="layui-body">
+        <div id="content"></div>
+    </div>
+</div>
+
+
+<script id="remm" type="text/html">
+    <form style="padding: 25px 30px 0 0;" class="layui-form model-form">
+        <div class="layui-form-item">
+            <label class="layui-form-label layui-form-required">原始密码:</label>
+            <div class="layui-input-block">
+                <input type="password" name="oldPsw" placeholder="请输入原始密码" class="layui-input"
+                       lay-verType="tips" lay-verify="required" required/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label layui-form-required">新密码:</label>
+            <div class="layui-input-block">
+                <input type="password" name="newPsw" id="newPsw" placeholder="请输入新密码" class="layui-input"
+                       lay-verType="tips" lay-verify="required" required/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label layui-form-required">确认密码:</label>
+            <div class="layui-input-block">
+                <input type="password" name="rePsw" id="rePsw" placeholder="请再次输入新密码" class="layui-input"
+                       lay-verType="tips" lay-verify="required"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block text-right">
+                <button class="layui-btn" lay-filter="submit-psw" lay-submit>保存</button>
+                <button class="layui-btn layui-btn-primary" type="button" onclick="layer.closeAll();">取消</button>
+            </div>
+        </div>
+    </form>
+
+</script>
+
+<!-- 移动端 遮盖层 -->
+<div class="pear-cover"></div>
+
+<th:block th:include="include :: loading"/>
+<th:block th:include="include :: footer"/>
+<script>
+    layui.use(['pearAdmin', 'jquery', 'pearTab', 'form','pearOper'], function () {
+        var pearAdmin = layui.pearAdmin;
+        var $ = layui.jquery;
+        var pearTab = layui.pearTab;
+        var form = layui.form;
+        var pearOper = layui.pearOper;
+
+        var config = {
+            keepLoad: 1000,                        // 主 页 加 载 过 度 时 长 可为 false
+            muiltTab: true,                        // 是 否 开 启 多 标 签 页 true 开启 false 关闭
+            control: false,                        // 是 否 开 启 多 系 统 菜 单 true 开启 false 关闭
+            theme: "dark-theme",                   // 默 认 主 题 样 式 dark-theme 默认主题 light-theme 亮主题
+            index: 'main',    // 默 认 加 载 主 页
+            data: '/assets/data/menu.json',          // 菜 单 数 据 加 载 地 址
+            done: function () {
+
+            }
+        };
+        pearAdmin.render(config);
+
+
+        /**
+         * 重置系统密码
+         */
+        $("#repwd").click(function () {
+            layer.open({
+                type: 1,
+                area: ['600px'],
+                title: "修改密码",
+                content: $('#remm').html(),
+                success: function (layero, index) {
+
+                }
+            });
+        });
+
+        form.on('submit(submit-psw)', function (data) {
+            var newPsw = $("#newPsw").val();
+            console.log(newPsw);
+            var rePwd = $("#rePsw").val();
+            console.log(rePwd);
+            if (newPsw != rePwd) {
+                layer.msg("2次密码不一致", {icon: 2});
+                return false;
+            }
+
+            $.ajax({
+                url: getRootPath() + "/admin/rePwd",
+                type: "post",
+                dataType: "json",
+                data: data.field,
+                beforeSend: function () {
+                    pearOper.Load(5, "");
+                },
+                success: function (result) {
+                    if (result.code === 0) {
+                        //弹窗在最上层 不然会被关闭
+                        top.layer.msg(result.msg, {icon: 1});
+                    } else {
+                        top.layer.msg(result.msg, {icon: 2});
+                    }
+                },
+                error: function () {
+                    layer.msg("网络错误了呢~");
+                },
+                complete: function () {
+                    pearOper.loadRemove("10");
+                }
+            });
+            return false;
+        });
+    })
+
+</script>
+</body>
+</html>

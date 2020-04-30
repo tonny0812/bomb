@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${config.get('site_title')}"></title>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=0.9" name="viewport">
+    <!-- 防止跨域-->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+    <meta name="description" th:content="${config.get('descript')}">
+    <meta name="keywords" th:content="${config.get('keywords')}">
+    <link href="favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <link rel="stylesheet" th:href="@{/component/css/bootstrap.css}">
+    <style>
+        .panel {
+            border: none;
+            border-radius: 10px;
+        }
+
+        .panel {
+            box-shadow: 1px 1px 5px 5px rgba(169, 169, 169, 0.35);
+            -moz-box-shadow: 1px 1px 5px 5px rgba(169, 169, 169, 0.35);
+        }
+    </style>
+</head>
+<body th:background="${'/assets/images/bg.jpg'}"
+      th:maxTime="${config.get('max_time')}">
+<div class="container" style="padding-top:20px;">
+    <div class="col-xs-12 col-sm-10 col-lg-8 center-block" style="float: none;">
+        <div class="panel panel-primary">
+            <div class="panel-heading" style="background: linear-gradient(to right,#8ae68a,#5ccdde,#b221ff);">
+                <center>
+                    <font color="#000000"><b>[[${config.get('site_name')}]]~</b></font>
+                </center>
+            </div>
+            <div class="panel-body">
+                <center>
+                    <div class="alert alert-success">
+                        <a href="/">
+                            <img alt="头像" class="img-circle m-b-xs" height="60px"
+                                 style="border: 2px solid #1281FF; margin-left:3px; margin-right:3px;"
+                                 th:src="@{'http://q2.qlogo.cn/headimg_dl?dst_uin='+${config.get('qq_value')}  +'&spec=140'}"
+                                 width="60px"><br>
+                        </a>提交手机号码后会自动进入队列排队轰炸,请勿重复提交哦...队列过多可能比较慢呢
+                    </div>
+                </center>
+                <div class="input-group">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-user"></span> 大佬人称</span>
+                    <input class="form-control" id="name" name="name" required type="text" value="不留名"/>
+                </div>
+                <br/>
+                <div class="input-group">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-time"></span> 轰炸时间</span>
+                    <input class="form-control" id="attackTime" max="15" min="1" name="attackTime"
+                           required="required" th:placeholder="${'最大轰炸'+ config.get('max_time') +'分钟'}" type="number"/>
+                </div>
+                <br/>
+                <div class="input-group">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-phone"></span> 轰炸号码</span>
+                    <input class="form-control" id="phone" name="phone"
+                           placeholder="只支持+86中国号码" required="required"
+                           size="11"/>
+                </div>
+                <br/>
+                <center>
+                    <div aria-label="..." class="btn-group btn-group-justified" role="group">
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-primary" id="bombing" name="bombing" type="button">开始轰炸</button>
+                        </div>
+                    </div>
+                </center>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-12 col-sm-10 col-lg-8 center-block" style="float: none;">
+        <div class="panel panel-primary">
+            <div class="panel-heading" style="background: linear-gradient(to right,#b221ff,#14b7ff,#8ae68a);">
+                <center>
+                    <font color="#000000"><b>大佬们的轰炸记录</b></font>
+                </center>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>
+                            请求日期
+                        </th>
+                        <th>
+                            大佬尊称
+                        </th>
+                        <th>
+                            轰炸号码
+                        </th>
+                        <th>
+                            轰炸时间
+                        </th>
+                        <th>
+                            状态
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="bomb : ${bombList.list}">
+                        <td th:text="${#dates.format(bomb.createTime, 'yyyy-MM-dd HH:mm')}"></td>
+                        <td th:text="${bomb.name}"></td>
+                        <td th:text="${bomb.phone}"></td>
+                        <td>
+                            [[${bomb.attackTime}]] 分钟</b>
+                        </td>
+                        <td th:if="${bomb.isAttack==0}">
+                            <font color="red">未开始</font>
+                        </td>
+                        <td th:if="${bomb.isAttack==1}">
+                            <font color="cornflowerblue">进行中</font>
+                        </td>
+                        <td th:if="${bomb.isAttack==2}">
+                            <font color="green">已完成</font>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div style="padding: 10px 25px 10px 10px;float: right;">
+                    <a th:href="@{/(pageNum=${bombList.prePage})}" th:if="${bombList.hasPreviousPage}">上一页</a>
+                    <a th:href="@{/(pageNum=${bombList.nextPage})}" th:if="${bombList.hasNextPage}">下一页</a>
+                    当前第 <code>[[${bombList.pageNum}]]</code> 页，共 <code>[[${bombList.pages}]]</code> 页，<code>[[${bombList.total}]]</code>
+                    条数据。
+                </div>
+            </div>
+        </div>
+
+        <div class="panel panel-info">
+            <div class="panel-heading" style="background: linear-gradient(to right,#f4ff2a,#c2de4d,#67f3ff);">
+                <center>
+                    <font color="#000000"><b>网站相关</b></font>
+                </center>
+                </h3>
+            </div>
+            <table class="table table-bordered">
+
+                <tbody>
+
+                <tr height="50">
+
+                    <td>
+                        <button class="btn btn-block btn-success" data-target="#help" data-toggle="modal">
+                            使用需知
+                        </button>
+                    </td>
+
+                    <td>
+                        <button class="btn btn-block btn-success" data-target="#whitelist" data-toggle="modal">
+                            提交白名单
+                        </button>
+                    </td>
+
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 使用需知 -->
+        <div aria-labelledby="myModalLabel" class="modal fade" id="help" role="dialog" tabindex="-1">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button aria-label="Close" class="close" data-dismiss="modal" type="button"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel">使用需知(*^▽^*)</h4>
+                    </div>
+                    <div class="modal-body" th:utext="${config.get('bulletin')}">
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-danger" data-dismiss="modal" style="width: 100%" type="button">关闭
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--提交白名单-->
+        <div aria-labelledby="myModalLabel" class="modal fade" id="whitelist" role="dialog" tabindex="-1">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button aria-label="Close" class="close" data-dismiss="modal" type="button"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="myModalLabel1">提交白名单o(*￣︶￣*)o</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label class="control-label" for="whitelistPhone">手机号码:</label>
+                                <input class="form-control" id="whitelistPhone" required type="text">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-default" data-dismiss="modal" type="button">关闭</button>
+                        <button class="btn btn-primary" id="submitWhitelist" type="button">提交</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel panel-info">
+            <div class="panel-heading" style="background: linear-gradient(to right,#14b7ff,#5ccdde,#b221ff);">
+                <center>
+                    <font color="#000000"><b>站点日志</b></font>
+                </center>
+                </h3>
+            </div>
+            <table class="table table-bordered">
+                <tbody>
+                <tr height="50">
+                    <td align="center">
+                        <font color="#808080"><b>今日轰炸总数</b></br><code>[[${bombNow}]]</code></br>次</font>
+                    </td>
+                    <td align="center">
+                        <font color="#808080"><b>累计轰炸总数</b></br><code>[[${bombAll}]]</code></br>
+                            次</font>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">
+                        <font color="#808080"><b>网站接口总数</b></br><code>[[${apiCount}]]</code></br>
+                            个</font>
+                    </td>
+                    <td align="center">
+                        <font color="#808080"><b>白名单数量</b></br><code>[[${whitelist}]]</code></br>
+                            条</font>
+                    </td>
+                </tr>
+
+                <tbody>
+            </table>
+        </div>
+        <p style="text-align:center;">
+            [[${config.get('copyright')}]] Powered by <a href="#" target="_blank">LLmoe</a>!
+        </p>
+    </div>
+</div>
+
+<script th:src="@{/component/js/jquery-3.3.1.min.js}"></script>
+<script th:src="@{/component/layer/layer.js}"></script>
+<script th:src="@{/component/js/bootstrap.min.js}"></script>
+<script th:src="@{/component/js/app.js}"></script>
+<script th:src="@{/component/js/index.js}"></script>
+</body>
+</html>

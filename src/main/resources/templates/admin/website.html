@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" th:href="@{/component/layui/css/layui.css}"/>
+    <link rel="stylesheet" th:href="@{/assets/css/pearCommon.css}"/>
+    <link rel="stylesheet" th:href="@{/assets/css/pearOper.css}"/>
+    <style>
+        .layui-form-label {
+            color: rgb(102, 102, 102);
+        }
+
+        #webConfig .layui-form-label {
+            width: 100px; /* 这里修改标题宽度 */
+        }
+
+        #webConfig .layui-input-block {
+            margin-left: 130px; /* 这里要比上面始终大30px */
+        }
+
+        .pear-container {
+            background-color: whitesmoke;
+            margin: 10px;
+        }
+
+        .load-div {
+            width: 100%;
+            height: 300px;
+            background-color: lightgray;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+        .layui-form-item .layui-input-company {
+            width: auto;
+            padding-right: 10px;
+            line-height: 38px;
+        }
+
+    </style>
+</head>
+<body>
+<body class="pear-container">
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">网站设置</div>
+                <div class="layui-card-body" pad15>
+
+                    <div class="layui-form" id="webConfig" lay-filter="" wid100>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">网站名称</label>
+                            <div class="layui-input-block">
+                                <input class="layui-input" lay-verify="required" name="site_name"
+                                       placeholder="输入网站名称" th:value="${config.get('site_name')}"
+                                       type="text">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">网站域名</label>
+                            <div class="layui-input-block">
+                                <input class="layui-input" lay-verify="required|url" name="domain"
+                                       placeholder="网站的域名，这个无所谓" th:value="${config.get('domain')}"
+                                       type="text">
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label">首页标题</label>
+                            <div class="layui-input-block">
+                                <input class="layui-input" lay-verify="required" name="site_title"
+                                       placeholder="首页头部标题" th:value="${config.get('site_title')}"
+                                       type="text">
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label">代理API接口</label>
+                            <div class="layui-input-block">
+                                <input class="layui-input" name="proxy_api"
+                                       placeholder="代理API接口" th:value="${config.get('proxy_api')}"
+                                       type="text">
+                                <div class="layui-word-aux" style="margin-top: 5px;">
+                                    返回代理IP格式需为：IP:端口，例如：39.137.69.6:80，一次只需要获取一个代理IP,不填默认不启用代理
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label">QQ号码</label>
+                            <div class="layui-input-block">
+                                <input class="layui-input" lay-verify="required|number" name="qq_value"
+                                       placeholder="QQ号码" th:value="${config.get('qq_value')}"
+                                       type="text">
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label">测试手机号</label>
+                            <div class="layui-input-block">
+                                <input class="layui-input" lay-verify="required|phone" name="test_phone"
+                                       placeholder="测试手机号(后台测试短信接口轰炸的号码)" th:value="${config.get('test_phone')}"
+                                       type="text">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">最大轰炸时间</label>
+                            <div class="layui-input-inline" style="width: 100px;">
+                                <input class="layui-input" lay-verify="required|number" name="max_time"
+                                       th:value="${config.get('max_time')}" type="text" value="1">
+                            </div>
+                            <div class="layui-input-inline layui-input-company">分钟</div>
+                            <div class="layui-form-mid layui-word-aux">推荐设置 1-3分钟。</div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">同时运行任务数</label>
+                            <div class="layui-input-inline" style="width: 100px;">
+                                <input class="layui-input" lay-verify="required|number" name="max_task"
+                                       th:value="${config.get('max_task')}" type="text" value="1">
+                            </div>
+                            <div class="layui-input-inline layui-input-company">个</div>
+                            <div class="layui-form-mid layui-word-aux">推荐设置 3-10个。</div>
+                        </div>
+
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label">关键词</label>
+                            <div class="layui-input-block">
+                                <textarea class="layui-textarea" name="keywords"
+                                          placeholder="多个关键词用英文状态 , 号分割">[[${config.get('keywords')}]]</textarea>
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label">网站描述</label>
+                            <div class="layui-input-block">
+                                <textarea class="layui-textarea"
+                                          name="descript"
+                                          placeholder="这里是网站描述，便于SEO">[[${config.get('descript')}]]</textarea>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label">使用需知</label>
+                            <div class="layui-input-block">
+                                <textarea class="layui-textarea"
+                                          name="bulletin"
+                                          placeholder="这里是使用需知,可以使用HTML代码">[[${config.get('bulletin')}]]</textarea>
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label">版权信息</label>
+                            <div class="layui-input-block">
+                                <textarea class="layui-textarea" name="copyright"
+                                          placeholder="底部的版权信息">[[${config.get('copyright')}]]</textarea>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <button class="layui-btn" lay-filter="set_website" lay-submit>确认保存</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+<th:block th:include="include :: footer"/>
+<script>
+    layui.use(['form', 'jquery', 'pearOper'], function () {
+        let form = layui.form;
+        let $ = layui.jquery;
+        let pearOper = layui.pearOper;
+
+
+        /**
+         * 提交保存
+         */
+        form.on('submit(set_website)', function (data) {
+            pearOper.Load(5, "");
+            $.ajax({
+                type: "POST",
+                url: getRootPath() + '/admin/config/update',
+                data: JSON.stringify(data.field),
+                dataType: "json",
+                contentType: "application/json;charset=utf-8",
+                success: function (data) {
+                    pearOper.loadRemove("10");
+                    if (data.code === 0) {
+                        layer.msg(data.msg);
+                    } else {
+                        layer.msg(data.msg);
+                    }
+                },
+                error: function () {
+                    layer.msg("服务器出错啦！！");
+                }
+            });
+            return false;
+        });
+    })
+</script>
+</body>
+</html>

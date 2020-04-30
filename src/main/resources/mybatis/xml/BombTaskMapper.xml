@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.llmoe.bomb.mapper.BombTaskMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.llmoe.bomb.entity.BombTask">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="attack_time" property="attackTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="phone" property="phone"/>
+        <result column="start_time" property="startTime"/>
+        <result column="is_attack" property="isAttack"/>
+        <result column="request_ip" property="requestIp"/>
+        <result column="request_browser" property="requestBrowser"/>
+        <result column="request_device" property="requestDevice"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, attack_time, create_time, phone, start_time, is_attack,request_browser,request_device,request_ip
+    </sql>
+
+    <update id="updateTaskStatus">
+        UPDATE bomb_task
+        SET is_attack=2
+        WHERE TIMESTAMPDIFF(MINUTE, start_time, NOW()) > attack_time
+          AND is_attack = 1
+    </update>
+    <select id="listCoverUp" resultType="com.llmoe.bomb.entity.BombTask">
+        SELECT id,
+               NAME,
+               attack_time,
+               create_time,
+               replace(phone, substr(phone, 4, 4), '****') AS phone,
+               is_attack
+        FROM bomb_task
+        order by id desc
+    </select>
+
+</mapper>

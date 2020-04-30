@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1,
+    "title": "API接口",
+    "type": 1,
+    "icon": "layui-icon layui-icon-link",
+    "openType": "_iframe",
+    "href": "/admin/api-interface",
+    "spread": true
+  },
+  {
+    "id": 2,
+    "title": "白名单",
+    "icon": "layui-icon layui-icon-form",
+    "type": 1,
+    "openType": "_iframe",
+    "href": "/admin/whitelist",
+    "spread": true
+  },
+  {
+    "id": 3,
+    "title": "轰炸队列",
+    "icon": "layui-icon layui-icon-release",
+    "type": 1,
+    "openType": "_iframe",
+    "href": "/admin/bomb-task",
+    "spread": true
+  },
+  {
+    "id": 4,
+    "title": "网站设置",
+    "icon": "layui-icon layui-icon-set",
+    "type": 1,
+    "openType": "_iframe",
+    "href": "/admin/config",
+    "spread": true
+  },
+  {
+    "id": 5,
+    "title": "SQL监控",
+    "icon": "layui-icon layui-icon-chart-screen",
+    "type": 1,
+    "openType": "_iframe",
+    "href": "/druid",
+    "spread": true
+  }
+]
