@@ -52,7 +52,7 @@ public class WhitelistController extends BaseController {
     @ResponseBody
     public TableDataInfo list(Whitelist whitelist) {
         startPage();
-        List<Whitelist> list = whitelistService.list(new QueryWrapper<Whitelist>().like(StrUtil.isNotBlank(whitelist.getPhone()), "phone", whitelist.getPhone()));
+        List<Whitelist> list = whitelistService.list(new QueryWrapper<Whitelist>().like(StrUtil.isNotBlank(whitelist.getPhone()), "phone", whitelist.getPhone()).orderByDesc("create_time"));
         return getDataTable(list);
     }
 

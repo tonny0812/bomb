@@ -55,7 +55,7 @@ public class BombTaskController extends BaseController {
     @ResponseBody
     public TableDataInfo list(BombTask bombTask) {
         startPage();
-        List<BombTask> list = bombTaskService.list(new QueryWrapper<BombTask>(bombTask));
+        List<BombTask> list = bombTaskService.list(new QueryWrapper<BombTask>(bombTask).orderByDesc("create_time"));
         return getDataTable(list);
     }
 
